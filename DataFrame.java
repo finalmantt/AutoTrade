@@ -4,6 +4,9 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JScrollPane;
+import javax.swing.Scrollable;
+
 import com.ib.controller.Bar;
 
 public class DataFrame {
@@ -176,10 +179,13 @@ public class DataFrame {
 		header.add(name);
 	}
 	
-	public void addRow(ArrayList<String> data) {
-		this.data.add(data);		
+	public JScrollPane getTable() {
+		String[][] data_item = to2DArray();
+		ArrayList<String> header = getHeader();
+		TableData tb = new TableData(data_item, header);
+		return tb.getTable();
 	}
-
+	
 	public void showTable() {
 		String[][] data_item = to2DArray();
 		ArrayList<String> header = getHeader();
@@ -243,4 +249,11 @@ public class DataFrame {
 		return bars;
 	}
 
+	public void addRow(String account, String string) {
+		// TODO Auto-generated method stub
+		
+	}
+	public void addRow(ArrayList<String> data) {
+		this.data.add(data);		
+	}
 }

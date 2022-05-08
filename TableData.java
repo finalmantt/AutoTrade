@@ -10,6 +10,7 @@ import javax.swing.JTable;
 public class TableData extends JFrame {
 	
 	DataFrame df = new DataFrame();
+	JScrollPane scrollPane;
 
 	public TableData() {
 		// TODO Auto-generated constructor stub
@@ -25,9 +26,9 @@ public class TableData extends JFrame {
 		// TODO Auto-generated constructor stub
 		JTable table = new JTable(data_item, header.toArray());
 
+		scrollPane= new JScrollPane(table);
 		
-		JScrollPane scrollPane = new JScrollPane(table);
-//		scrollPane.setPreferredSize(new Dimension(500, 250));
+		scrollPane.setPreferredSize(new Dimension(400, 200));
 		add(scrollPane);
 		
 	}
@@ -35,6 +36,9 @@ public class TableData extends JFrame {
 	public void init() {
 		setSize(600, 400);
 		setVisible(true);
+	}
+	public JScrollPane getTable() {
+		return scrollPane;
 	}
 	
 	public void showTable() {

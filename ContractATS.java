@@ -40,4 +40,29 @@ public class ContractATS {
         contract.exchange("SMART");
 		return contract; 
 	}
+	
+	public static Contract getContractOptionExample() {
+//		conid	558277737
+//		symbol	AAPL
+//		secType	OPT
+//		lastTradeDateOrContractMonth	20220513
+//		strike	157.5
+//		right	P
+//		multiplier	100
+//		exchange	SMART
+//		currency	USD
+//		localSymbol	AAPL  220513P00157500
+//		tradingClass	AAPL
+		
+		 Contract contract = new Contract();
+        contract.symbol("AAPL");
+        contract.secType("OPT");
+        contract.lastTradeDateOrContractMonth("20220513");
+        contract.strike(157.5);
+        contract.right("C");
+        contract.multiplier("100");        
+        contract.currency("USD");
+        contract.exchange("SMART");
+		return contract; 
+	}
 }

@@ -20,6 +20,9 @@ public class OrderDetail implements ILiveOrderHandler {
 	ArrayList<String> orderStateList = new ArrayList<String>();
 
 	public void getLiveOrder() {
+		this.contract.clear();
+		this.order.clear();
+		this.orderState.clear();
 		API.INSTANCE.m_controller.reqLiveOrders(this);
 	}
 
@@ -32,29 +35,33 @@ public class OrderDetail implements ILiveOrderHandler {
 //		List<String> header = Array.asList("Symbol","Action","Status");
 		List header = new List();
 
-		df.setHeader(Arrays.asList("Symbol", "SecType", "Action", "Status"));
-		for (int i = 0; i < contract.size(); i++) {
+		df.setHeader(Arrays.asList("ordeID","Symbol","OrderType", "SecType", "Action", "Status"));
+		for (int i = 0; i <contract.size(); i++) {
 			ArrayList<String> detail = new ArrayList<String>();
+			
+			detail.add(""+order.get(i).orderId());
 			detail.add(contract.get(i).symbol());
+			detail.add(order.get(i).getOrderType());
 			detail.add(contract.get(i).getSecType());
 			detail.add(order.get(i).getAction());
 			detail.add(orderState.get(i).getStatus());
 			df.addRow(detail);
+			
+			
 
 		}
+		System.out.println(contract.toString());
 		showTable();
 	}
 
-	public synchronized void showTable() {
+	public  void showTable() {
 		df.showTable();
 	}
 
 	@Override
 	public void openOrder(Contract contract, Order order, OrderState orderState) {
 		// TODO Auto-generated method stub
-		this.contract.clear();
-		this.order.clear();
-		this.orderState.clear();
+
 		
 		this.contract.add(contract);
 		this.order.add(order);
@@ -78,7 +85,7 @@ public class OrderDetail implements ILiveOrderHandler {
 			int permId, int parentId, double lastFillPrice, int clientId, String whyHeld, double mktCapPrice) {
 		// TODO Auto-generated method stub
 //		System.out.println("orderStatus");
-//		System.out.println("orderId: " +orderId+" "+status+" "+filled+" "+remaining+" "+avgFillPrice+" "+permId+" "+parentId+" "+lastFillPrice+" "+clientId+" "+whyHeld+" "+mktCapPrice);
+		System.out.println("orderId: " +orderId+" "+status+" "+filled+" "+remaining+" "+avgFillPrice+" "+permId+" "+parentId+" "+lastFillPrice+" "+clientId+" "+whyHeld+" "+mktCapPrice);
 //	System.out.println("xx orderStatus");
 	}
 

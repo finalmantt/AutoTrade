@@ -3,6 +3,7 @@ package autotrade;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import com.ib.client.Contract;
 import com.ib.controller.Bar;
 
 public class TestIndy {
@@ -32,9 +33,14 @@ public class TestIndy {
 
 		/// heiken ashi
 
-		indyHeikenAshi h = new indyHeikenAshi();
-		h.setHeiken(bars);
-		df.printSeries(h.HAO());
+//		indyHeikenAshi h = new indyHeikenAshi();
+//		h.setHeiken(bars);
+//		df.printSeries(h.HAO());
+		
+		
+		 Contract c = new Contract();
+		 String s = c.lastTradeDateOrContractMonth();
+		 System.out.println(s);
 
 	}
 

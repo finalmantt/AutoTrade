@@ -11,6 +11,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import com.ib.controller.Bar;
 import com.ib.controller.Position;
@@ -27,15 +28,14 @@ public class AccountATS extends JPanel implements IAccountHandler {
 	static DataFrame df = new DataFrame();
 	boolean active = false;
 	AccountATS(){
-//		ApiDemo.INSTANCE.controller().reqAccountUpdates(true, m_selAcct, this);
-		
-//		List<String>  accoutNO = API.INSTANCE.accountList();
+
 		String m_selAcct = API.INSTANCE.accountList().get(0);
 		System.out.println(">>"+m_selAcct);
 
 		API.INSTANCE.m_controller.reqAccountUpdates(true, m_selAcct, this);
-//		API.INSTANCE.m_controller.reqAcc(group, tags, handler);
+
 	}
+	
 	
 	public void getAccount() {
 		String m_selAcct = API.INSTANCE.accountList().get(0);
@@ -53,6 +53,9 @@ public class AccountATS extends JPanel implements IAccountHandler {
 //		df.addCol();
 		df.showTable();
 //		df.add(data2,);
+		JScrollPane scroll = df.getTable();
+		add(scroll);
+		
 		
 		
 	}
