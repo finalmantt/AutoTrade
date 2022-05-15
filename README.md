@@ -1,6 +1,8 @@
 # autotradeBack
-Setting TWS in Eclipse
+1. Install Eclipse 
+2. Install TWS API  
 
+# Setting TWS in Eclipse
 1. Create Java project 
 2. Put Project Name: autotrade 
 3. De-select Use defualt location 
