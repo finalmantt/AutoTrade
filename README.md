@@ -1,4 +1,4 @@
-# autotradeBack
+# autotrade
 1. Install Eclipse 
 2. Install TWS API  
 
