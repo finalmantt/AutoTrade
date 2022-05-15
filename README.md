@@ -1,5 +1,5 @@
 # autotradeBack
-Seting TWS in Eclipse
+Setting TWS in Eclipse
 
 1. Create Java project 
 2. Put Project Name: autotrade 
