@@ -1,109 +1,83 @@
 package autotrade;
 
-import com.ib.controller.ApiController.IAccountHandler;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
-import javax.swing.DefaultListModel;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+import java.util.Map;
+import java.util.Vector;
 
-import com.ib.controller.Bar;
+import com.ib.controller.ApiController.IAccountHandler;
 import com.ib.controller.Position;
 
-public class AccountATS extends JPanel implements IAccountHandler {
-	private JLabel m_lastUpdated = new JLabel();
-	
-	private String m_selAcct = "";
-	
-	private ArrayList<String> header = new ArrayList<String>();	
-//	private ArrayList<HashMap<String, String>> data = new ArrayList<>();
-	private ArrayList<ArrayList<String>> data = new ArrayList<>();
-	
-	static DataFrame df = new DataFrame();
-	boolean active = false;
-	AccountATS(){
 
-		String m_selAcct = API.INSTANCE.accountList().get(0);
-		System.out.println(">>"+m_selAcct);
+public class AccountATS implements IAccountHandler {
 
-		API.INSTANCE.m_controller.reqAccountUpdates(true, m_selAcct, this);
-
+	String accountID = "";
+	Map<String, Account> m_account = new HashMap<>();
+	TableData table = new TableData();
+	
+//	public AccountATS(String accountID) {
+//		System.out.println("Create Account");
+//		System.out.println("Account ID: " + accountID);
+//		this.accountID = accountID;
+//	}
+	public AccountATS(String accountID, TableData table) {
+		System.out.println("Create Account");
+		System.out.println("Account ID: " + accountID);
+		this.accountID = accountID;
+		
+		this.table = table;
 	}
-	
-	
-	public void getAccount() {
-		String m_selAcct = API.INSTANCE.accountList().get(0);
-		System.out.println(m_selAcct);
 
-		API.INSTANCE.m_controller.reqAccountUpdates(true, m_selAcct, this);
+	public void reqAccount() {
+		API.INSTANCE.m_controller.reqAccountUpdates(true, accountID, this);
 	}
+
 	public void setAccount() {
-
+		System.out.println("m_account >>" + m_account);
+		table.clear();
 		
-		
-		
-		df.setHeader(Arrays.asList("account","key","value","currency"));
-		df.setData(data);
-//		df.addCol();
-		df.showTable();
-//		df.add(data2,);
-		JScrollPane scroll = df.getTable();
-		add(scroll);
-		
-		
-		
-	}
-	public static void showAccount() {
-		System.out.println("show");
-		df.showTable();
-	}
-	@Override
-	public  void accountValue(String account, String key, String value, String currency) {
-		// TODO Auto-generated method stub
-
-		
-		ArrayList<String> aa = new ArrayList<String>();
-		aa.add(account);
-		aa.add(key);
-		aa.add(value);
-		aa.add(currency);
-		data.add(aa);
-		
+		for (Map.Entry<String, Account> entry : m_account.entrySet()) {
+			table.addRow(new String[] { entry.getValue().account(), entry.getValue().key(),
+					entry.getValue().value(), entry.getValue().currency()});
+//			API.tb_account.getModel().addRow(new String[] { entry.getValue().account(), entry.getValue().key(),
+//					entry.getValue().value(), entry.getValue().currency()});
+			
+			if(entry.getValue().key().equals("NetLiquidation")) {
+				API.txtMoney.setText(entry.getValue().value());
+			}
+		}
 	}
 
 	@Override
-	public  void accountTime(String timeStamp) {
+	public void accountValue(String account, String key, String value, String currency) {
 		// TODO Auto-generated method stub
-		System.out.println("accountTime"+ timeStamp);
-//		m_lastUpdated.setText( "Last updated: " + timeStamp + "       ");
-//		showAccount();
-	}
-
-	@Override
-	public  void accountDownloadEnd(String account) {
-		// TODO Auto-generated method stub
-		System.out.println("accountDownloadEnd");
-		System.out.println(account);
+		System.out.println("accountValue: " + " " + account + " " + key + " " + value + " " + currency);
+		String MapKey = key + "," + currency;
+		m_account.put(MapKey, new Account(account, key, value, currency));
 		setAccount();
-		
-//		if(active = false)
-//		{
-//			showAccount();
-//			active= true;
-//		}
 	}
 
 	@Override
-	public  void updatePortfolio(Position position) {
+	public void accountTime(String timeStamp) {
 		// TODO Auto-generated method stub
-		System.out.println("updatePortfolio" +position);
-//		showAccount();
+		System.out.println("accountTime:" +timeStamp);
+		
+	}
+
+	@Override
+	public void accountDownloadEnd(String account) {
+		// TODO Auto-generated method stub
+		System.out.println("==============accountDownloadEnd");
+
+	}
+
+	@Override
+	public void updatePortfolio(Position position) {
+		// TODO Auto-generated method stub
+		System.out.println(">>>>>>>>>>>>>>updatePortfolio");
+//		setAccount();
+		System.out.println("position update #### "+position.contract().localSymbol()+" "+position.position());
 	}
 
 }

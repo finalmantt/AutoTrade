@@ -7,6 +7,7 @@ import com.ib.controller.ApiController;
 import com.ib.controller.Formats;
 import com.ib.client.Contract;
 import com.ib.client.Order;
+import com.ib.client.Types.WhatToShow;
 import com.ib.controller.ApiConnection.ILogger;
 import com.ib.controller.ApiController.IConnectionHandler;
 import com.ib.controller.ApiController.IPositionHandler;
@@ -18,6 +19,7 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -26,6 +28,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 public class API implements IConnectionHandler {
@@ -36,14 +39,34 @@ public class API implements IConnectionHandler {
 	public ApiController m_controller = new ApiController(this, m_inLogger, m_outLogger);
 	static JTextArea txt_log = new JTextArea("");
 	public JScrollPane scroll_hist = null;
-	JFrame frame = new JFrame("IB Auto trade Sytem");
+	JFrame frame = new JFrame("IB Auto trade System");
 
 	private final List<String> m_acctList = new ArrayList<>();
 
+	public TableData tb_account = new TableData(new String[] { "account", "key", "value", "currency" });
+	public TableData tb_position = new TableData(new String[] { "account", "contract id", "symbol", "pos", "avg" });
+	public static TableData tb_bar = new TableData(new String[] { "time", "open", "high", "low", "close" });
+	public TableData tb_order = new TableData(
+			new String[] { "ordeID", "Symbol", "OrderType", "SecType", "Action", "Status" });
+
+	static JFrame ff = new JFrame("CHART");
+	public static JPanel chart = new JPanel();
+
+	JTextField txt_symbol = new JTextField("EUR");
 	JPanel p_west = new JPanel();
+	JPanel p_east = new JPanel();
 	JPanel p_center = new JPanel();
 	JPanel p_top = new JPanel();
 	JPanel p_buttom = new JPanel();
+
+	JPanel p_postion = new JPanel();
+	JPanel p_account = new JPanel();
+	JPanel p_order = new JPanel();
+
+	static JTextField txtMoney = new JTextField("1");
+	static JTextField txtPosition = new JTextField("2");
+	static JTextField txt_trade = new JTextField("0");
+	static JTextField txt_time = new JTextField("txt_time");
 
 	public static void main(String[] args) {
 		INSTANCE.run();
@@ -55,7 +78,7 @@ public class API implements IConnectionHandler {
 		JButton btn_connect = new JButton("connect");
 		JButton btn_disconnect = new JButton("disconnect");
 		JButton btn_account = new JButton("Account");
-		JButton btn_showaccount = new JButton("showAccount");
+
 		JButton btn_hist = new JButton("Historical");
 		JButton btn_order = new JButton("Order");
 		JButton btn_buy = new JButton("place order");
@@ -66,29 +89,21 @@ public class API implements IConnectionHandler {
 
 		JButton btn_autotrade = new JButton("Auto Trade");
 		JButton btn_stoptrade = new JButton("Stop Trade");
+		JButton btn_trade = new JButton("Trade");
+		JButton btn_realtime = new JButton("Realtime");
+		JButton btn_stopRealtime = new JButton("StopRealtime");
 
 		TextBox txt_conn = new TextBox("conn");
-//		implements IPositionHandler
 
 		JScrollPane scroll_log = new JScrollPane(txt_log);
 		scroll_log.setPreferredSize(new Dimension(500, 120));
 
-		GridLayout gridLayout = new GridLayout(0, 5);
-
-//		        compsToExperiment.setLayout(experimentLayout);
-//
-//		        compsToExperiment.add(new JButton("Button 1"));
-//		        compsToExperiment.add(new JButton("Button 2"));
-//		        compsToExperiment.add(new JButton("Button 3"));
-//		        compsToExperiment.add(new JButton("Long-Named Button 4"));
-//		        compsToExperiment.add(new JButton("5"));
-//		        
-
-		p_top.setLayout(gridLayout);
+		GridLayout gridTop = new GridLayout(0, 5);
+		p_top.setLayout(gridTop);
 		p_top.add(btn_connect);
 		p_top.add(btn_disconnect);
+		p_top.add(txt_time);
 		p_top.add(btn_account);
-		p_top.add(btn_showaccount);
 		p_top.add(btn_hist);
 		p_top.add(btn_buy);
 		p_top.add(btn_cancel);
@@ -96,22 +111,44 @@ public class API implements IConnectionHandler {
 		p_top.add(btn_option);
 		p_top.add(btn_position);
 		p_top.add(btn_closePosition);
+
 		p_top.add(btn_autotrade);
 		p_top.add(btn_stoptrade);
-		ScrollableJTable st = new ScrollableJTable();
+		p_top.add(txtMoney);
+		p_top.add(txtPosition);
+		p_top.add(txt_trade);
 
-		// p_center.add(scroll_hist);
-		p_center.add(txt_conn);
+		p_top.add(btn_trade);
+		p_top.add(txt_symbol);
+		p_top.add(btn_realtime);
+		p_top.add(btn_stopRealtime);
+
+		GridLayout gridWest = new GridLayout(0, 1);
+		p_west.setLayout(gridWest);
+		p_west.add(tb_account.getScroll());
+		p_west.add(tb_position.getScroll());
+
+		GridLayout gridCenter = new GridLayout(0, 1);
+		p_center.setLayout(gridCenter);
+		p_center.add(tb_bar.getScroll());
+		p_center.add(tb_order.getScroll());
+
+//		JButton bb = new JButton("123");
+//		p_east.add(chart);
 
 		p_buttom.add(scroll_log);
 
 		frame.add(p_top, BorderLayout.NORTH);
 		frame.add(p_center, BorderLayout.CENTER);
 		frame.add(p_west, BorderLayout.WEST);
+		frame.add(p_east, BorderLayout.EAST);
 		frame.add(p_buttom, BorderLayout.SOUTH);
-		frame.setSize(600, 600);
+		frame.setSize(900, 600);
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		ff.add(chart);
+		ff.setSize(600, 300);
 
 		btn_connect.addActionListener(new ActionListener() {
 
@@ -134,27 +171,21 @@ public class API implements IConnectionHandler {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				AccountATS a = new AccountATS();
+				showAccount();
+//				AccountATS a = new AccountATS();
 //				showAccout();
 				// comment
 
 			}
 		});
 
-		btn_showaccount.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				showAccout();
-			}
-		});
 		btn_hist.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				HistoryATS a = new HistoryATS();
+				a.reqHistorical();
 			}
 		});
 
@@ -172,7 +203,7 @@ public class API implements IConnectionHandler {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				checkOrder();
+				showOrder();
 
 			}
 		});
@@ -232,156 +263,120 @@ public class API implements IConnectionHandler {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				stepAuto = 0;
+//				
+//				String accID = accountList().get(0);
+//				AccountATS2 acc = new AccountATS2(accID);
+//				acc.reqAccount();
 			}
 		});
 
+		btn_trade.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				txt_trade.setText("1");
+			}
+		});
+
+		btn_realtime.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				realtime();
+			}
+		});
+		btn_stopRealtime.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				stopRealtime();
+			}
+		});
 		connect();
-		// Your implementation
-		///
-//		try {
-//			Thread.sleep(200);
-//		} catch (InterruptedException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
 
-//		String accountID = getAccountID();
-//		AccountATS2 a = new AccountATS2(accountID);
-//		a.reqAccount();
-//		
-//		PositionATS p = new PositionATS();
-//		p.reqPosition();
-
-//		try {
-//			Thread.sleep(200);
-//		} catch (InterruptedException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
-//		a.showTable();
 	}
 
 	public void connect() {
-		// go to connected() if completed
 
+//		m_controller.connect("127.0.0.1", 4002, 0, "");
 		m_controller.connect("127.0.0.1", 7496, 0, "");
+	}
 
+	RealTime real;
+
+	public void realtime() {
+		real = new RealTime(ContractATS.getContractFXExample());
+//		real = new RealTime(ContractATS.getContractStock(txt_symbol.getText()));
+	}
+
+	public void stopRealtime() {
+		real.reqStop();
 	}
 
 	static int stepAuto = 0;
+	static HistoryATS hist;
 
 	public void autoTrade() {
-
-//		while(true) {
 		System.out.println("start trade");
 		stepAuto = 1;
 
-//		for(int i= 0; i < 5; i++) {
-//			
-//			
-//			PlaceOrderATS pp = new PlaceOrderATS();
-//			pp.reqPlaceOrderExample();
-//			
-//		}
-
-		HistoryATS hist = new HistoryATS();
+		hist = new HistoryATS();
 		hist.reqHistorical();
 
-//			PositionATS p = new PositionATS();
-//			p.reqPosition();
-//			String  accId= accountList().get(0).toString();
-
-//			try {
-//				Thread.sleep(3000);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//		}
-
-//		System.out.println(accountList());
-//		AccountATS2 acc = new AccountATS2(accId);
-//		acc.reqAccount();
-//		System.out.println(acc.df.getData().size());
-//		acc.getDF();
-//		initialize();
 	}
-
-	AccountATS account;
 
 	public void initialize() {
-
-		String accountID = accountList().get(0).toString();
-//		System.out.println(accountID);
-		account = new AccountATS();
-		p_west.add(account);
-
+		showAccount();
+		showPosition();
+		showOrder();
 	}
-
-//	public String getAccountID() {
-//		while (accountList().size() == 0) {
-//			System.out.print("");
-//		}
-//		return accountList().get(0).toString();
-//	}
 
 	public void closePosition() {
-		Contract c = new Contract();
-		Position p = pos.getPositon();
-		c = p.contract();
-		c.exchange("SMART");
-
-		if (c != null) {
-			double qty = pos.getPositon().pos();
-
-			System.out.println(c.toString());
-
-//		placeOrder.placeOrder(contract, placeOrder.sellLimit(10, qty));
-			PlaceOrderATS pp = new PlaceOrderATS();
-			OrderATS oo = new OrderATS();
-			if (qty > 0)
-				pp.placeOrder(c, oo.sellMarket(qty));
-			else
-				pp.placeOrder(c, oo.buyMarket(qty * -1));
-			///
-		}
+//		Contract c = new Contract();
+//		Position p = pos.getPositon();
+//		c = p.contract();
+//		c.exchange("SMART");
+//
+//		if (c != null) {
+//			double qty = pos.getPositon().pos();
+//
+//			System.out.println(c.toString());
+//
+////		placeOrder.placeOrder(contract, placeOrder.sellLimit(10, qty));
+//			PlaceOrderATS pp = new PlaceOrderATS();
+//			OrderATS oo = new OrderATS();
+//			if (qty > 0)
+//				pp.placeOrder(c, oo.sellMarket(qty));
+//			else
+//				pp.placeOrder(c, oo.buyMarket(qty * -1));
+//			///
+//		}
 
 	}
 
-	PositionATS pos = new PositionATS();
+	PositionATS pos = new PositionATS(tb_position);
 
-	public void showPosition() {
+	public  void showPosition() {
 
 		pos.reqPosition();
-		try {
-			Thread.sleep(300);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-//		pos.setPosition();
-	}
-//	AccountATS a = new AccountATS();
-
-	public void showAccout() {
-		AccountATS.showAccount();
 
 	}
 
-	OrderDetail detail = new OrderDetail();
+	AccountATS acc = null;
 
-	public void checkOrder() {
+	public void showAccount() {
+		acc = new AccountATS(accountList().get(0), tb_account);
+		acc.reqAccount();
+	}
 
-		detail.getLiveOrder();
-//		try {
-//			Thread.sleep(100);
-//			
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		 detail.showTable();
+	LiveOrderATS detail = new LiveOrderATS(tb_order);
 
+	public void showOrder() {
+
+		detail.reqLiveOrder();
 	}
 
 	public void cancelOrder() {
@@ -444,13 +439,13 @@ public class API implements IConnectionHandler {
 	@Override
 	public void accountList(List<String> list) {
 		// TODO Auto-generated method stub
-		System.out.println("Account List:" + list.toString());
+//		System.out.println("Account List:" + list.toString());
 
 		show("Received account list");
 		m_acctList.clear();
 		m_acctList.addAll(list);
 
-//		initialize();
+		initialize();
 	}
 
 	@Override

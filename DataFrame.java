@@ -3,7 +3,9 @@ package autotrade;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
 
@@ -63,6 +65,7 @@ public class DataFrame {
 	public static double round(double d) {
 		DecimalFormat df = new DecimalFormat(".##");
 		return Double.parseDouble(df.format(d));
+		
 	}
 
 	public static void printSeries(Series s) {
@@ -75,7 +78,8 @@ public class DataFrame {
 			i++;
 		}
 	}
-
+	
+	
 	public static void printSeries(ArrayList<String> data) {
 		// ArrayList<Double> data = s.getSeries();
 		int i = 0;
@@ -144,7 +148,24 @@ public class DataFrame {
 		}
 		return s;
 	}
+	public Vector<String> getCol(String name) {
+//		ArrayList<String> s = new ArrayList<String>();
+		
+		int i=0;
+		for(String head:header) {
+			if(head.equals(name)) {				
+				break;
+			}
+			i++;
+		}
+		
+		Vector<String> s = new Vector<String>();
 
+		for (ArrayList<String> d : data) {
+			s.add(d.get(i));
+		}
+		return s;
+	}
 	private final ArrayList<Double> HAO = new ArrayList<Double>();
 	private final ArrayList<Double> HAC = new ArrayList<Double>();
 	private final ArrayList<Double> HAH = new ArrayList<Double>();
@@ -175,28 +196,44 @@ public class DataFrame {
 		for (int i = 0; i < data.size(); i++) {
 			data.get(i).add("" + series.get(i));
 		}
-
+		API.tb_bar.addColumn(name, getCol(name));
+		API.tb_bar.setScrollToButtom();
+//		API.tb_bar.getScroll().setHorizontalScrollBar(new JScrollBar(10));
 		header.add(name);
 	}
+	
+	
+//	String indy1 = "SMA5";
+//	String indy2 = "SMA21";
+//	API.tb_bar.addColumn(indy1, df.getCol(indy1));
+//	API.tb_bar.addColumn(indy2,df.getCol(indy2));
+//	API.tb_bar.addColumn("ATR",df.getCol("ATR"));
+//	API.tb_bar.setScrollToButtom();
+	
 	
 	public JScrollPane getTable() {
 		String[][] data_item = to2DArray();
 		ArrayList<String> header = getHeader();
 		TableData tb = new TableData(data_item, header);
-		return tb.getTable();
+		return tb.getScroll(); /// note
 	}
 	
 	public void showTable() {
 		String[][] data_item = to2DArray();
 		ArrayList<String> header = getHeader();
 		TableData tb = new TableData(data_item, header);
-		tb.showTable();
+//		tb.showTable();
 	}
 
 	public void showChart() {
-		ChartData c = new ChartData();
-		c.setData(bars);
-		c.show();
+//		ChartData c = new ChartData();
+//		c.setData(bars);
+//		c.show();
+		ChartATS c = new ChartATS(bars);
+		API.chart.add(c);
+		API.ff.setVisible(true);
+
+	
 
 	}
 

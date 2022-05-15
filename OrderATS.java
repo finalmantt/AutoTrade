@@ -36,7 +36,7 @@ public class OrderATS {
 	
 	
 	
-	public Order sellMarket(double Qty) {
+	public static  Order sellMarket(double Qty) {
 		Order order = new Order();
 		order.action(Action.SELL);
 		order.orderType("MKT");

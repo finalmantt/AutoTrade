@@ -55,10 +55,11 @@ public class PlaceOrderATS implements IOrderHandler {
 		if (API.stepAuto == 1) {
 
 			System.out.println("End Auto trade");
+			
 //			API.delay(5, ">>>>>>>>>>wait 5 secoud to start new trade");
-			System.out.println("Start new auto trade");
-			HistoryATS hist = new HistoryATS();
-			hist.reqHistorical();
+//			System.out.println("Start new auto trade");
+//			HistoryATS hist = new HistoryATS();
+//			hist.reqHistorical();
 
 //			PositionATS p = new PositionATS();
 //			p.reqPosition();

@@ -22,7 +22,7 @@ public class Position {
 	public double marketValue() 	{ return m_marketValue;}
 	public double realPnl() 		{ return m_realPnl;}
 	public double unrealPnl() 		{ return m_unrealPnl;}
-	public double position() 			{ return m_position;}
+
 	public String account() 		{ return account;}
 
 	public double pos() 			{ return pos;}
@@ -32,7 +32,7 @@ public class Position {
 	public Position( Contract contract, String account, double position, double marketPrice, double marketValue, double averageCost, double unrealPnl, double realPnl) {
 		this.contract = contract;
 		this.account = account;
-		m_position = position;
+		
 		m_marketPrice = marketPrice;
 		m_marketValue =marketValue;
 		m_averageCost = averageCost;

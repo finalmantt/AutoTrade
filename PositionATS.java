@@ -1,107 +1,91 @@
 package autotrade;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Vector;
 
 import com.ib.client.Contract;
 import com.ib.controller.ApiController.IPositionHandler;
 
 public class PositionATS implements IPositionHandler {
-	ArrayList<Position> position = new ArrayList<Position>();
+	Map<String, Position> m_postion = new HashMap<>();
 
-//	ArrayList<String> data = new ArrayList<String>();
-	DataFrame df = new DataFrame();
-
-	PositionATS() {
+	TableData table; 
+	PositionATS(TableData table) {
 		// from API to AccountATS2
+		this.table = table;
 		System.out.println("Create Position");
 	}
 
 	public void reqPosition() {
-		df.clear();
-		position.clear();
-		System.out.println("position >" +position);
 		API.INSTANCE.m_controller.reqPositions(this);
 	}
 
-//	public void showPosition() {
-//		
-//	}
 	public void setPosition() {
+		System.out.println("setPosition postion > " + m_postion.size());
 
-		System.out.println("stepAuto = " + API.stepAuto + " account id = " + API.INSTANCE.accountList());
-		df.setHeader(Arrays.asList("account", "contract id", "symbol", "pos", "avg"));
-		for (Position p : position) {
-			ArrayList<String> detail = new ArrayList<String>();
+		table.clear();
+		
+		for (Map.Entry<String, Position> entry : m_postion.entrySet()) {
+//			System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+			table.addRow(new String[] { 
+					entry.getValue().account(), 
+					"" + entry.getValue().conid(),
+					entry.getValue().contract().localSymbol(), 
+					"" + entry.getValue().pos(),
+					"" + entry.getValue().avgCost()});
+			
 
-			detail.add(p.account());
-			detail.add("" + p.conid());
-			detail.add(p.contract().localSymbol());
-			detail.add("" + p.pos());
-			detail.add("" + p.avgCost());
-
-			df.addRow(detail);
-
-		}
-
-		API.INSTANCE.p_west.add(df.getTable());
-		API.INSTANCE.frame.repaint();
-		API.INSTANCE.frame.setVisible(true);
-
-	
-//		showTable();
-	}
-
-	public Position getPositon() {
-
-		for (Position p : position) {
-			if (p.pos() != 0) {
-				return p;
+			
+			if(entry.getValue().pos() > 0) {
+				API.txtPosition.setText(""+entry.getValue().pos());
 			}
 		}
-//		
-//		
-//		if(position.size() !=0) {
-//			Position p = position.get(0); 
-//			System.out.println(">>>"+p);
-//			return p;
+		
+//		Vector<Vector > V = API.tb_position.getData(); //.getModel().getDataVector();
+//		int i = 0;
+//		for(Vector v : V) {
+////			System.out.println(v.get(1));
+//			API.txtPosition.setText(""+v.get(3));
+////			API.txtMoney.setText(""+API.tb_position.getModel().getValueAt(i, 1));
+//			i++;
 //		}
-//		else
+		
+		
+	}
+
+	public Position getPositonID() {
+
+//		for (Position p : position) {
+//			if (p.pos() != 0) {
+//				return p;
+//			}
+//		}
+
 		return null;
 	}
 
-	public void showTable() {
-		df.showTable();
-	}
+	
 
 	@Override
 	public void position(String account, Contract contract, double pos, double avgCost) {
 		// TODO Auto-generated method stub
-//		Position p = new Position(account, contract, pos, avgCost);
-		position.add(new Position(account, contract, pos, avgCost));
-//		Position p = new Position(contract, account, position, marketPrice, marketValue, averageCost, unrealPnl, realPnl)
-//	System.out.println("position come");
+
+//		System.out.println("position" + account + " " + contract.conid() + " " + pos + " " + avgCost);
+//		System.out.println();
+
+		System.out.println("add position");
+		m_postion.put("" + contract.conid(), new Position(account, contract, pos, avgCost));
+		setPosition();
+
 	}
 
 	@Override
 	public void positionEnd() {
+		System.out.println("positionEnd");
 		// TODO Auto-generated method stub
-		setPosition();
-		
-		///// auto trade
-		if (API.INSTANCE.stepAuto == 1) {
-			System.out.println("position.size() = " + position.size());
+//		setPosition();
 
-			System.out.println("stepAuto = " + API.stepAuto + " account id = " + API.INSTANCE.accountList());
-			String accoundID = API.INSTANCE.accountList().get(0);
 
-			HistoryATS hist = new HistoryATS();
-			hist.reqHistorical();
-
-//			AccountATS2 acc = new AccountATS2(accoundID);
-//			acc.reqAccount();
-//			System.out.println(acc.df.getData().size());
-		}
 	}
-
 }
