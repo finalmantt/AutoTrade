@@ -47,6 +47,7 @@ public class AccountATS implements IAccountHandler {
 				API.txtMoney.setText(entry.getValue().value());
 			}
 		}
+		
 	}
 
 	@Override
@@ -69,6 +70,7 @@ public class AccountATS implements IAccountHandler {
 	public void accountDownloadEnd(String account) {
 		// TODO Auto-generated method stub
 		System.out.println("==============accountDownloadEnd");
+		table.setScrollToButtom();
 
 	}
 

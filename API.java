@@ -309,6 +309,7 @@ public class API implements IConnectionHandler {
 
 	public void realtime() {
 		real = new RealTime(ContractATS.getContractFXExample());
+//		real = new  RealTime(ContractATS.getContractStock("AAPL"));
 //		real = new RealTime(ContractATS.getContractStock(txt_symbol.getText()));
 	}
 

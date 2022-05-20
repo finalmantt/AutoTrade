@@ -22,17 +22,22 @@ public class TestIndy {
 //		 sma.setSMA(5, close);
 //		 df.printSeries(sma.getSMA());
 
-		Series close = df.getColBar("close");
-		IndyRMA rma = new IndyRMA();
-		rma.setRMA(5, close);
-		DataFrame.printSeries(rma.getRMA());
+//		Series close = df.getColBar("close");
+//		IndyRMA rma = new IndyRMA();
+//		rma.setRMA(5, close);
+//		DataFrame.printSeries(rma.getRMA());
 		// atr///
-//		 indyATR atr = new indyATR();
+//		 IndyATR atr = new IndyATR();
 //		 atr.setATR(bars);
-//		// DataFrame.printSeries(atr.getTR());
-//		 df.printSeries(atr.getATR(10,"sma"));
+//		 df.printSeries(atr.getATR(10,"rma"));
 		//////
-
+		
+		IndyATRStop atrstop = new IndyATRStop();
+		atrstop.setIndy(10, bars);
+		System.out.println(atrstop.getSignal().toStringArray());
+//		df.printSeries(atrstop.getSignal());
+		
+	
 		/// heiken ashi
 
 //		indyHeikenAshi h = new indyHeikenAshi();

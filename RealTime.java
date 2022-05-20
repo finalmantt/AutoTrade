@@ -99,7 +99,7 @@ public class RealTime implements IRealTimeBarHandler {
 //
 //				PlaceOrderATS place = new PlaceOrderATS();
 //				place.placeOrder(contract, OrderATS.buyMarket(20000));
-//			}
+			}
 //			if (second.equals("00")){
 			if (second.equals("20") || second.equals("40") || second.equals("00")) {
 				gethist(year,month,day,hour,minute,second);
@@ -107,7 +107,7 @@ public class RealTime implements IRealTimeBarHandler {
 
 //				PlaceOrderATS place = new PlaceOrderATS();
 //				place.placeOrder(contract, OrderATS.sellMarket(20000));
-			}
+//			}
 
 		}
 	}
@@ -118,7 +118,7 @@ public class RealTime implements IRealTimeBarHandler {
 
 		int duration = 2;
 		DurationUnit durationUnit = DurationUnit.DAY;
-		BarSize barSize = BarSize._1_min;
+		BarSize barSize = BarSize._15_mins;
 
 		System.out.println(bartime);
 
@@ -136,5 +136,6 @@ public class RealTime implements IRealTimeBarHandler {
 		
 		setRealTime(bar);
 	}
+	
 
 }
