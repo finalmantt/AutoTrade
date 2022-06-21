@@ -16,6 +16,7 @@ public class DataFrame {
 	private ArrayList<ArrayList<String>> data = new ArrayList<>();
 
 	ArrayList<Bar> bars;
+	
 
 	public void setHeader(List<String> lists) {
 		ArrayList<String> header = new ArrayList<String>();
@@ -166,6 +167,19 @@ public class DataFrame {
 		}
 		return s;
 	}
+	public int getColIndex(String name) {
+
+		int i=0;
+		for(String head:header) {
+			if(head.equals(name)) {				
+				break;
+			}
+			i++;
+		}
+		
+		
+		return i;
+	}
 	private final ArrayList<Double> HAO = new ArrayList<Double>();
 	private final ArrayList<Double> HAC = new ArrayList<Double>();
 	private final ArrayList<Double> HAH = new ArrayList<Double>();
@@ -191,14 +205,24 @@ public class DataFrame {
 
 		header.add(name);
 	}
+	public void addCol(ArrayList<String> col, String name, TableData tb_bar) {
+		for (int i = 0; i < data.size(); i++) {
+			data.get(i).add(col.get(i));
+		}
 
-	public void addCol(Series series, String name) {
+		header.add(name);
+		tb_bar.addColumn(name, getCol(name));
+		tb_bar.setScrollToButtom();
+
+	}
+
+	public void addCol(Series series, String name, TableData tb_bar) {
 		for (int i = 0; i < data.size(); i++) {
 			data.get(i).add("" + series.get(i));
 		}
-		API.tb_bar.addColumn(name, getCol(name));
-		API.tb_bar.setScrollToButtom();
-//		API.tb_bar.getScroll().setHorizontalScrollBar(new JScrollBar(10));
+		tb_bar.addColumn(name, getCol(name));
+		tb_bar.setScrollToButtom();
+
 		header.add(name);
 	}
 	
@@ -225,15 +249,11 @@ public class DataFrame {
 //		tb.showTable();
 	}
 
-	public void showChart() {
-//		ChartData c = new ChartData();
-//		c.setData(bars);
-//		c.show();
+	public void showChart(ArrayList<Bar> bars) {
+
+		API.chart.removeAll();
 		ChartATS c = new ChartATS(bars);
 		API.chart.add(c);
-		API.ff.setVisible(true);
-
-	
 
 	}
 
@@ -241,7 +261,6 @@ public class DataFrame {
 		Series s = new Series();
 		for (T d :data) {
 			s.add(Double.parseDouble(""+d));
-//			if(T = TypeNotPresentException.)
 		}
 		
 		return s;

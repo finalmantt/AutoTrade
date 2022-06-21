@@ -11,6 +11,7 @@ public class PositionATS implements IPositionHandler {
 	Map<String, Position> m_postion = new HashMap<>();
 
 	TableData table; 
+	double postion = 0;
 	PositionATS(TableData table) {
 		// from API to AccountATS2
 		this.table = table;
@@ -24,7 +25,7 @@ public class PositionATS implements IPositionHandler {
 	public void setPosition() {
 		System.out.println("setPosition postion > " + m_postion.size());
 
-		table.clear();
+		table.clearRows();
 		
 		for (Map.Entry<String, Position> entry : m_postion.entrySet()) {
 //			System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
@@ -39,6 +40,7 @@ public class PositionATS implements IPositionHandler {
 			
 			if(entry.getValue().pos() > 0) {
 				API.txtPosition.setText(""+entry.getValue().pos());
+				postion = entry.getValue().pos();
 			}
 		}
 		
@@ -52,6 +54,10 @@ public class PositionATS implements IPositionHandler {
 //		}
 		
 		
+	}
+	public double getPostion() {
+		
+		return postion;
 	}
 
 	public Position getPositonID() {

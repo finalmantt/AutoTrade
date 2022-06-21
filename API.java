@@ -1,19 +1,26 @@
 //https://filipmolcik.com/connecting-to-interactive-brokers-api-with-java/
 //https://holowczak.com/ib-api-java-realtime/5/
 //http://holowczak.com/ib-api-java-historical/7/
+
+//https://medium.com/swlh/algorithmic-trading-system-development-1a5a200af260
 package autotrade;
 
 import com.ib.controller.ApiController;
 import com.ib.controller.Formats;
 import com.ib.client.Contract;
 import com.ib.client.Order;
+import com.ib.client.Types.BarSize;
 import com.ib.client.Types.WhatToShow;
 import com.ib.controller.ApiConnection.ILogger;
 import com.ib.controller.ApiController.IConnectionHandler;
 import com.ib.controller.ApiController.IPositionHandler;
 
+import apidemo.util.TCombo;
+import apidemo.util.VerticalPanel;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -22,10 +29,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -46,13 +56,21 @@ public class API implements IConnectionHandler {
 	public TableData tb_account = new TableData(new String[] { "account", "key", "value", "currency" });
 	public TableData tb_position = new TableData(new String[] { "account", "contract id", "symbol", "pos", "avg" });
 	public static TableData tb_bar = new TableData(new String[] { "time", "open", "high", "low", "close" });
-	public TableData tb_order = new TableData(
-			new String[] { "ordeID", "Symbol", "OrderType", "SecType", "Action", "Status" });
+	public TableData tb_order = new TableData(new String[] { "orderId", "status", "filled", "remaining", "avgFillPrice",
+			"permId", "parentId", "lastFillPrice", "clientId", "whyHeld", "mktCapPrice" });
 
-	static JFrame ff = new JFrame("CHART");
+	public TableData tb_dataTset = new TableData(new String[] { "time", "close" });
+
+	public TableData tb_backtest = new TableData(new String[] { "time", "open", "high", "low", "close" });
+	public TableData tb_pl = new TableData(new String[] { "time", "signal", "buy price", "sell price", "PL" });
+
+	public TableData tb_autoTrade = new TableData(new String[] { "time", "open", "high", "low", "close" });
+
+//
+//	static JFrame ff = new JFrame("CHART");
 	public static JPanel chart = new JPanel();
-
-	JTextField txt_symbol = new JTextField("EUR");
+	JTabbedPane tabPanel = new JTabbedPane();
+//	JTextField txt_symbol = new JTextField("EUR");
 	JPanel p_west = new JPanel();
 	JPanel p_east = new JPanel();
 	JPanel p_center = new JPanel();
@@ -62,11 +80,18 @@ public class API implements IConnectionHandler {
 	JPanel p_postion = new JPanel();
 	JPanel p_account = new JPanel();
 	JPanel p_order = new JPanel();
+	JPanel p_backtest = new JPanel();
 
 	static JTextField txtMoney = new JTextField("1");
-	static JTextField txtPosition = new JTextField("2");
-	static JTextField txt_trade = new JTextField("0");
+	static JTextField txtPosition = new JTextField("txtPosition");
+
 	static JTextField txt_time = new JTextField("txt_time");
+	static JTextField txtLiveOrder = new JTextField("txtLiveOrder");
+
+	ContractPanel contractPanel = new ContractPanel();
+//	ContractPanel contractPanel2 = new ContractPanel();
+	PlaceOrderPanel p_placeOrder = new PlaceOrderPanel();
+	InputText txt_pl = new InputText("PL", "0.0000");
 
 	public static void main(String[] args) {
 		INSTANCE.run();
@@ -86,22 +111,27 @@ public class API implements IConnectionHandler {
 		JButton btn_option = new JButton("Option contract");
 		JButton btn_position = new JButton("get position");
 		JButton btn_closePosition = new JButton("close postion");
+		JButton btn_backtest = new JButton("Backtest");
+		JButton btn_autoTrade = new JButton("Auto Trade");		
+		JButton btn_autoStart = new JButton("Start Trade");
+		JButton btn_autoStop = new JButton("Stop Trade");
+		JButton btn_autoSMA = new JButton("Auto SMA");
+		
 
-		JButton btn_autotrade = new JButton("Auto Trade");
-		JButton btn_stoptrade = new JButton("Stop Trade");
-		JButton btn_trade = new JButton("Trade");
 		JButton btn_realtime = new JButton("Realtime");
 		JButton btn_stopRealtime = new JButton("StopRealtime");
-
-		TextBox txt_conn = new TextBox("conn");
 
 		JScrollPane scroll_log = new JScrollPane(txt_log);
 		scroll_log.setPreferredSize(new Dimension(500, 120));
 
+		JPanel p_connect = new JPanel();
+		p_connect.add(btn_connect);
+		p_connect.add(btn_disconnect);
+
 		GridLayout gridTop = new GridLayout(0, 5);
 		p_top.setLayout(gridTop);
-		p_top.add(btn_connect);
-		p_top.add(btn_disconnect);
+//		p_top.add(btn_connect);
+//		p_top.add(btn_disconnect);
 		p_top.add(txt_time);
 		p_top.add(btn_account);
 		p_top.add(btn_hist);
@@ -111,44 +141,97 @@ public class API implements IConnectionHandler {
 		p_top.add(btn_option);
 		p_top.add(btn_position);
 		p_top.add(btn_closePosition);
-
-		p_top.add(btn_autotrade);
-		p_top.add(btn_stoptrade);
 		p_top.add(txtMoney);
 		p_top.add(txtPosition);
-		p_top.add(txt_trade);
-
-		p_top.add(btn_trade);
-		p_top.add(txt_symbol);
 		p_top.add(btn_realtime);
 		p_top.add(btn_stopRealtime);
-
+		p_top.add(btn_backtest);
+		p_top.add(btn_autoTrade);
+		p_top.add(btn_autoSMA);
+		///////////////// West
 		GridLayout gridWest = new GridLayout(0, 1);
 		p_west.setLayout(gridWest);
 		p_west.add(tb_account.getScroll());
-		p_west.add(tb_position.getScroll());
+//		p_west.add(tb_position.getScroll());
+
+		///////////// Center
+
+		JPanel center_buttom = new JPanel();
+
+		center_buttom.add(tb_position.getScroll());
+		center_buttom.add(tb_order.getScroll());
 
 		GridLayout gridCenter = new GridLayout(0, 1);
+//		GridBagLayout gridCenter = new GridBagLayout();
 		p_center.setLayout(gridCenter);
+//		p_center.add(p_barDetail);
 		p_center.add(tb_bar.getScroll());
-		p_center.add(tb_order.getScroll());
+		p_center.add(center_buttom);
 
-//		JButton bb = new JButton("123");
-//		p_east.add(chart);
+		///// East
+		p_east.add(chart);
+		p_east.add(tb_dataTset.getScroll());
 
+		///// Buttom
 		p_buttom.add(scroll_log);
 
+//		JPanel p_contract = new JPanel();	
+
+//		ButtonGroup group = new ButtonGroup();		
+//		contractPanel.getRadioButton().setSelected(true);		
+//		group.add(contractPanel.getRadioButton() );
+//		group.add(contractPanel2.getRadioButton() );
+
+//		p_contract.add(contractPanel);
+//		p_contract.add(contractPanel2);
+		///// back test
+		p_backtest.add(tb_backtest.getScroll());
+		p_backtest.add(tb_pl.getScroll());
+		p_backtest.add(txt_pl);
+//		p_bakkte
+		//// TabPanel structure
+
+		//// Auto trade
+		JPanel p_autotrade = new JPanel();
+		InputText net = new InputText("Net liqudity", "0");
+		InputText txtSym = new InputText("Symbol", "EUR/USD");
+		InputText signal = new InputText("signal", "0");
+		GridLayout grid_autotrade = new GridLayout(5, 1);
+		
+		JPanel sub_autotrade = new JPanel();
+		sub_autotrade.setLayout(grid_autotrade);
+		p_autotrade.add(tb_autoTrade.getScroll());
+		sub_autotrade.add(btn_autoStart);
+		sub_autotrade.add(btn_autoStop);
+		sub_autotrade.add(net);
+		sub_autotrade.add(txtSym);
+		sub_autotrade.add(signal);
+		
+		p_autotrade.add(sub_autotrade);
+
+//		JButton btn_placeOrder = new JButton("Place");
+//		p_placeOrder.addComp(btn_placeOrder);
+		
+		tabPanel.add("Account/Postion", p_west); // tabPanel.setSelectedIndex(0);
+		tabPanel.add("Historical/Order", p_center); // tabPanel.setSelectedIndex(1);
+		tabPanel.add("Chart", p_east); // tabPanel.setSelectedIndex(2);
+		tabPanel.add("Bar Detail", contractPanel); // tabPanel.setSelectedIndex(3);
+		tabPanel.add("Back test", p_backtest); // tabPanel.setSelectedIndex(4);
+		tabPanel.add("Connecting", p_connect);// tabPanel.setSelectedIndex(4);
+		tabPanel.add("AutoTrade", p_autotrade);// tabPanel.setSelectedIndex(6);
+		tabPanel.add("placeOrder", p_placeOrder);// tabPanel.setSelectedIndex(7);
+		///// End TabPane
+
+		//// Frame structure
 		frame.add(p_top, BorderLayout.NORTH);
-		frame.add(p_center, BorderLayout.CENTER);
-		frame.add(p_west, BorderLayout.WEST);
-		frame.add(p_east, BorderLayout.EAST);
+		frame.add(tabPanel, BorderLayout.CENTER);
 		frame.add(p_buttom, BorderLayout.SOUTH);
+
 		frame.setSize(900, 600);
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		ff.add(chart);
-		ff.setSize(600, 300);
+		//// End Frame structure
 
 		btn_connect.addActionListener(new ActionListener() {
 
@@ -184,8 +267,9 @@ public class API implements IConnectionHandler {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				HistoryATS a = new HistoryATS();
-				a.reqHistorical();
+
+				historical();
+
 			}
 		});
 
@@ -194,6 +278,7 @@ public class API implements IConnectionHandler {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
+				
 				buyOder();
 
 			}
@@ -207,7 +292,8 @@ public class API implements IConnectionHandler {
 
 			}
 		});
-
+		
+		
 		btn_cancel.addActionListener(new ActionListener() {
 
 			@Override
@@ -248,37 +334,6 @@ public class API implements IConnectionHandler {
 			}
 		});
 
-		btn_autotrade.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				autoTrade();
-			}
-		});
-
-		btn_stoptrade.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				stepAuto = 0;
-//				
-//				String accID = accountList().get(0);
-//				AccountATS2 acc = new AccountATS2(accID);
-//				acc.reqAccount();
-			}
-		});
-
-		btn_trade.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				txt_trade.setText("1");
-			}
-		});
-
 		btn_realtime.addActionListener(new ActionListener() {
 
 			@Override
@@ -295,6 +350,41 @@ public class API implements IConnectionHandler {
 				stopRealtime();
 			}
 		});
+
+		btn_backtest.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				backtest();
+			}
+		});
+
+		btn_autoTrade.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				autoTrade();
+			}
+		});
+		
+		btn_autoStart.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				autoStart();
+			}
+		});
+		btn_autoStop.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				autoStop();
+			}
+		});
 		connect();
 
 	}
@@ -307,27 +397,64 @@ public class API implements IConnectionHandler {
 
 	RealTime real;
 
+//	
+//	public Contract getContractPanel() {
+//		String symbol = contractPanel.get_symbol();
+//		symbol = symbol.toUpperCase();
+//		System.out.println(symbol);
+//		Contract contract;
+//		if (symbol.contains("/")) {
+//			String symbol1 = symbol.split("/")[0];
+//			String symbol2 = symbol.split("/")[1];
+//			contract = ContractATS.getContractFX(symbol1, symbol2);
+//
+//		} else {
+//			contract = ContractATS.getContractStock(symbol);
+//
+//		}
+//		return contract;
+//	}
+	public void autoTrade() {
+		tabPanel.setSelectedIndex(6);
+//		AutoTrade auto = new AutoTrade(contractPanel,tb_autoTrade);
+
+	}
+	AutoTreadGO autogo ;
+	public void autoStart() {	
+		autogo = new AutoTreadGO(contractPanel,tb_autoTrade);
+	}
+
+	public void autoStop() {
+		autogo.reqStop();
+	}
+	public void historical() {
+		tabPanel.setSelectedIndex(1);
+//		HistoryATS a = new HistoryATS(contractPanel.getContact(), contractPanel.get_barSize());
+
+		HistoryATS a = new HistoryATS(contractPanel);
+	}
+
 	public void realtime() {
-		real = new RealTime(ContractATS.getContractFXExample());
-//		real = new  RealTime(ContractATS.getContractStock("AAPL"));
-//		real = new RealTime(ContractATS.getContractStock(txt_symbol.getText()));
+		tabPanel.setSelectedIndex(1);
+		real = new RealTime(contractPanel);
 	}
 
 	public void stopRealtime() {
 		real.reqStop();
 	}
 
-	static int stepAuto = 0;
-	static HistoryATS hist;
+	BackTest backtest = new BackTest();
 
-	public void autoTrade() {
-		System.out.println("start trade");
-		stepAuto = 1;
+	public void backtest() {
+		tabPanel.setSelectedIndex(4);
 
-		hist = new HistoryATS();
-		hist.reqHistorical();
+		backtest = new BackTest(tb_backtest, tb_pl, contractPanel);
+		backtest.setTextPL(txt_pl);
+		backtest.reqHist();
 
 	}
+
+	static int stepAuto = 0;
 
 	public void initialize() {
 		showAccount();
@@ -360,7 +487,7 @@ public class API implements IConnectionHandler {
 
 	PositionATS pos = new PositionATS(tb_position);
 
-	public  void showPosition() {
+	public void showPosition() {
 
 		pos.reqPosition();
 
@@ -373,11 +500,11 @@ public class API implements IConnectionHandler {
 		acc.reqAccount();
 	}
 
-	LiveOrderATS detail = new LiveOrderATS(tb_order);
+	LiveOrderATS liveOrder = new LiveOrderATS(tb_order);
 
 	public void showOrder() {
 
-		detail.reqLiveOrder();
+		liveOrder.reqLiveOrder();
 	}
 
 	public void cancelOrder() {
@@ -387,9 +514,15 @@ public class API implements IConnectionHandler {
 	}
 
 	public void buyOder() {
-		PlaceOrderATS p = new PlaceOrderATS();
-		OrderATS oo = new OrderATS();
-		p.placeOrder(ContractATS.getContractStock("IBM"), oo.buyLimit(2, 1));
+		
+		 tabPanel.setSelectedIndex(7);
+//		PlaceOrderATS p = new PlaceOrderATS();
+//		OrderATS oo = new OrderATS();
+//		p.placeOrder(ContractATS.getContractStock("IBM"), oo.buyLimit(2, 1));
+		
+//		PlaceOrderATS p = new PlaceOrderATS();
+//		p.placeBracketOder();
+//		p.placeOrder(ContractATS.getContractFXExample(), OrderATS.buyMarket(10000));
 	}
 
 	public List<String> accountList() {

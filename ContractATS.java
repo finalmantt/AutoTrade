@@ -22,6 +22,22 @@ public class ContractATS {
 		contract.secType("CASH");
 		contract.currency(Symbol2);
 		contract.exchange("IDEALPRO");
+		
+		
+		return contract; 
+	}
+	
+	public static Contract getContractFX(String Symbol) {
+		String Symbol1 = Symbol.split("/")[0];
+		String Symbol2 = Symbol.split("/")[1];
+		
+		Contract contract = new Contract();
+		contract.symbol(Symbol1);
+		contract.secType("CASH");
+		contract.currency(Symbol2);
+		contract.exchange("IDEALPRO");
+		
+		
 		return contract; 
 	}
 	public static Contract getContractFXExample() {

@@ -15,7 +15,7 @@ public class OrderATS {
 		return order;
 	}
 
-	public Order buyLimit(double limit, double Qty) {
+	public static Order buyLimit(double limit, double Qty) {
 		Order order = new Order();
 		order.action(Action.BUY);
 		order.orderType("LMT");
@@ -24,7 +24,7 @@ public class OrderATS {
 		order.tif(TimeInForce.DAY);
 		return order;
 	}
-	public Order buyStop(double stop, double Qty) {
+	public static Order buyStop(double stop, double Qty) {
 		Order order = new Order();
 		order.action(Action.BUY);
 		order.orderType("STP");
@@ -46,7 +46,7 @@ public class OrderATS {
 		return order;
 	}
 
-	public Order sellLimit(double limit, double Qty) {
+	public static Order sellLimit(double limit, double Qty) {
 		Order order = new Order();
 		order.action(Action.SELL);
 		order.orderType("LMT");
@@ -56,7 +56,7 @@ public class OrderATS {
 		return order;
 	}
 
-	public Order sellStop(double stop, double Qty) {
+	public static Order sellStop(double stop, double Qty) {
 		Order order = new Order();
 		order.action(Action.SELL);
 		order.orderType("STP");

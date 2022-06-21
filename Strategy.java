@@ -23,7 +23,7 @@ public class Strategy {
 		Series close = df.getColBar("close");
 		IndySMA s5 = new IndySMA();
 		s5.setSMA(5, close);
-		df.addCol(s5.getSMA(), "SMA5");
+		df.addCol(s5.getSMA(), "SMA5",API.tb_bar);
 		//////////////////////////////////////
 
 		/////////////// SMA //////////////////
@@ -34,7 +34,7 @@ public class Strategy {
 		s21.setSMA(21, close);
 
 		// 3. add to dataframe
-		df.addCol(s21.getSMA(), "SMA21");
+		df.addCol(s21.getSMA(), "SMA21",API.tb_bar);
 
 		///// heieken
 //		indyHeikenAshi h = new indyHeikenAshi();

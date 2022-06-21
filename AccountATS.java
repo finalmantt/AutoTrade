@@ -35,7 +35,7 @@ public class AccountATS implements IAccountHandler {
 
 	public void setAccount() {
 		System.out.println("m_account >>" + m_account);
-		table.clear();
+		table.clearRows();
 		
 		for (Map.Entry<String, Account> entry : m_account.entrySet()) {
 			table.addRow(new String[] { entry.getValue().account(), entry.getValue().key(),
