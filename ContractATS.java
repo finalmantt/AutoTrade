@@ -57,6 +57,18 @@ public class ContractATS {
 		return contract; 
 	}
 	
+	public static Contract getContractOption(String symbol, String right, double strike, String date) {
+		Contract contract = new Contract();
+        contract.symbol(symbol);
+        contract.secType("OPT");
+        contract.lastTradeDateOrContractMonth(date);
+        contract.strike(strike);
+        contract.right(right);
+        contract.multiplier("100");        
+        contract.currency("USD");
+        contract.exchange("SMART");
+		return contract; 
+	}
 	public static Contract getContractOptionExample() {
 //		conid	558277737
 //		symbol	AAPL
@@ -73,8 +85,8 @@ public class ContractATS {
 		 Contract contract = new Contract();
         contract.symbol("AAPL");
         contract.secType("OPT");
-        contract.lastTradeDateOrContractMonth("20220513");
-        contract.strike(157.5);
+        contract.lastTradeDateOrContractMonth("20220624");
+        contract.strike(136);
         contract.right("C");
         contract.multiplier("100");        
         contract.currency("USD");

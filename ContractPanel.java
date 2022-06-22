@@ -18,6 +18,7 @@ import apidemo.util.VerticalPanel;
 public class ContractPanel extends JPanel {
 	
 	JTextField symbol = new JTextField("EUR/USD");
+//	TCombo <String> symbol_list = new  TCombo<String>();
 	JTextField duration = new JTextField("2");
 	TCombo <BarSize> barSize = new TCombo<>( BarSize.values() );
 	TCombo <DurationUnit> durationUnit = new TCombo<>( DurationUnit.values() );

@@ -154,20 +154,25 @@ public class AutoTrade implements IHistoricalDataHandler {
 		for (Map.Entry<String, Position> entry : postion.m_postion.entrySet()) {
 			String posSymbol = entry.getValue().contract().symbol();
 			double posN = entry.getValue().pos();			
-			System.out.println(posSymbol + " "+  posN);
+			System.out.println(posSymbol + ">>> "+  posN);
 			
-			
-			if(!posSymbol.equals("EUR")) {
+			// choose AAPL or EUR and ckeck secType
+			if(!posSymbol.equals("AAPL") ) {
 				continue;
 			}
 			
-			System.out.println("Trade EUR");
+//			if(!posSymbol.equals("EUR")) {
+//				continue;
+//			}
 			
+			System.out.println("Trade "+posSymbol);
 			
-
+//			sig =1;
+			double qty = 20;  /// for AAPL
+//			double qty = 20000; // for EUR
 			if (sig == 1 ) {
 				PlaceOrderATS p = new PlaceOrderATS();
-				double qty = 20000;
+				
 				
 				if(posN == 0 ) { // no position then buy to open
 					System.out.println("Buy to open");
@@ -184,16 +189,16 @@ public class AutoTrade implements IHistoricalDataHandler {
 				}
 				else if (posN < 0) { // sell to close position
 					
-					System.out.println("Sell to close");
+					System.out.println("Buy to close");
 					p.placeOrder(contract, OrderATS.buyMarket(qty));
 					
 					LogFile w = new LogFile();
-					w.appendPlaceOrder(data+", Sell to Close, "+posSymbol+", "+qty);
+					w.appendPlaceOrder(data+", Buy to Close, "+posSymbol+", "+qty);
 				}
 			}
 			else if (sig == -1 ) {
 				PlaceOrderATS p = new PlaceOrderATS();
-				double qty = 20000;
+				
 				
 				if(posN == 0 ) { // no position then sell to open
 					System.out.println("sell  to open");
@@ -203,11 +208,11 @@ public class AutoTrade implements IHistoricalDataHandler {
 					w.appendPlaceOrder(data+", Sell to Open, "+posSymbol+", "+qty);
 				}
 				else if (posN > 0) { // buy to close 
-					System.out.println("buy to close ");
+					System.out.println("Sell to close ");
 					p.placeOrder(contract, OrderATS.sellMarket(qty));
 					
 					LogFile w = new LogFile();
-					w.appendPlaceOrder(data+", Buy to Close, "+posSymbol+", "+qty);
+					w.appendPlaceOrder(data+", Sell to Close, "+posSymbol+", "+qty);
 					
 				}
 				else if (posN < 0) { // sell already
