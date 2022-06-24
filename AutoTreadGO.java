@@ -12,9 +12,12 @@ public class AutoTreadGO implements IRealTimeBarHandler {
 	Contract contract = new Contract();
 	TableData tableData;
 	Bar bar;
+	String qty = "";
 
-	public AutoTreadGO(ContractPanel contractPanel, TableData tableData) {
+	public AutoTreadGO(ContractPanel contractPanel, TableData tableData, String qty) {
 		// TODO Auto-generated constructor stub
+		
+		this.qty = qty;
 		this.tableData = tableData;
 		this.contractPanel = contractPanel;
 		this.contract = contractPanel.getContact();
@@ -52,7 +55,7 @@ public class AutoTreadGO implements IRealTimeBarHandler {
 		API.txt_time.setText(time);
 //		if (second.equals("00") || second.equals("20") || second.equals("40")) {
 //		if (second.equals("00") || second.equals("30")) {
-			AutoTrade auto = new AutoTrade(contractPanel, tableData);
+			AutoTrade auto = new AutoTrade(contractPanel, tableData, qty);
 //		}
 	}
 

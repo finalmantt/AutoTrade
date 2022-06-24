@@ -17,7 +17,8 @@ import apidemo.util.VerticalPanel;
 
 public class ContractPanel extends JPanel {
 	
-	JTextField symbol = new JTextField("EUR/USD");
+	String symbol = "EUR/USD";
+	JTextField txt_symbol = new JTextField(symbol);
 //	TCombo <String> symbol_list = new  TCombo<String>();
 	JTextField duration = new JTextField("2");
 	TCombo <BarSize> barSize = new TCombo<>( BarSize.values() );
@@ -27,7 +28,19 @@ public class ContractPanel extends JPanel {
 	
 	Contract contract =new Contract();
 	public String get_symbol() {
-		return symbol.getText();
+		return symbol;
+	}
+	public void set_symbol(String symbol) {
+		this.symbol = symbol;
+		txt_symbol.setText(symbol);
+	}
+	
+	public void set_symbol() {
+		System.out.println();
+		symbol = txt_symbol.getText();
+		
+		System.out.println("Set >>>>>> "+symbol);
+		txt_symbol.setText(symbol);
 	}
 	public Integer get_duration() {
 		return Integer.parseInt(duration.getText());
@@ -41,18 +54,22 @@ public class ContractPanel extends JPanel {
 	public WhatToShow get_whatToShow() {
 		return whatToShow.getSelectedItem();
 	}
-	
+	public void setSymbol(String symbol) {
+		
+	}
 //	public JRadioButton getRadioButton() {
 //		return btn1;
 //	}
 	ContractPanel(){
+		
+		
 		barSize.setSelectedItem(BarSize._15_mins);
 		durationUnit.setSelectedItem(DurationUnit.DAY);
 		whatToShow.setSelectedItem(WhatToShow.TRADES);
 		
 		VerticalPanel p_barDetail = new VerticalPanel();	
 //		p_barDetail.add(btn1);
-		p_barDetail.add("Symbol",symbol);
+		p_barDetail.add("Symbol",txt_symbol);
 		p_barDetail.add("Bar size",barSize);
 		p_barDetail.add("Duration",duration);
 		p_barDetail.add("Suration Unit",durationUnit);
@@ -60,6 +77,8 @@ public class ContractPanel extends JPanel {
 		
 		setLayout(new GridLayout(0, 1));
 		add(p_barDetail);
+		
+		
 	}
 	public Contract getContact() {
 		String symbol = get_symbol();

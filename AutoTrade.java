@@ -28,8 +28,10 @@ public class AutoTrade implements IHistoricalDataHandler {
 	ContractPanel contractPanel;
 
 	TableData tableData;
+	String qty = "";
 
-	AutoTrade(ContractPanel contractPanel, TableData tableData) {
+	AutoTrade(ContractPanel contractPanel, TableData tableData, String qty) {
+		this.qty = qty;
 		this.tableData = tableData;
 		this.contractPanel = contractPanel;
 		this.contract = contractPanel.getContact();
@@ -150,87 +152,94 @@ public class AutoTrade implements IHistoricalDataHandler {
 		String data = df.getData().get(df.getData().size()-1).toString();
 		System.out.println(data);
 		
-		
+		double posN = 0;
 		for (Map.Entry<String, Position> entry : postion.m_postion.entrySet()) {
-			String posSymbol = entry.getValue().contract().symbol();
-			double posN = entry.getValue().pos();			
-			System.out.println(posSymbol + ">>> "+  posN);
 			
+			posN = entry.getValue().pos();			
+			
+			Contract con = entry.getValue().contract();
 			// choose AAPL or EUR and ckeck secType
-			if(!posSymbol.equals("AAPL") ) {
-				continue;
-			}
-			
-//			if(!posSymbol.equals("EUR")) {
-//				continue;
-//			}
-			
-			System.out.println("Trade "+posSymbol);
-			
-//			sig =1;
-			double qty = 20;  /// for AAPL
-//			double qty = 20000; // for EUR
-			if (sig == 1 ) {
-				PlaceOrderATS p = new PlaceOrderATS();
-				
-				
-				if(posN == 0 ) { // no position then buy to open
-					System.out.println("Buy to open");
-					p.placeOrder(contract, OrderATS.buyMarket(qty));	
-					
-					
-					LogFile w = new LogFile();
-					w.appendPlaceOrder(data+", Buy to Open, "+posSymbol+", "+qty);
-					
-				}
-				else if (posN > 0) { // buy already
-					System.out.println("Buy alreay ");
 
-				}
-				else if (posN < 0) { // sell to close position
-					
-					System.out.println("Buy to close");
-					p.placeOrder(contract, OrderATS.buyMarket(qty));
-					
-					LogFile w = new LogFile();
-					w.appendPlaceOrder(data+", Buy to Close, "+posSymbol+", "+qty);
-				}
+//			System.out.println("check "+con.symbol() + " "+  con.currency() +" "+ con.secType() + " "+ qty);
+//			System.out.println("with "+contract.symbol() + " "+  contract.currency() +" "+ contract.secType()+" " +posN);
+			if(con.symbol().equals(contract.symbol()) && 
+					con.currency().equals(contract.currency()) &&
+					con.secType().equals(contract.secType())
+					) {
+				break;
+//				System.out.println("Trade "+con.symbol() +" "+con.currency() +" "+ con.secType() + qty);
+//				sendOrder(data, sig,posN,Double.parseDouble(qty));
 			}
-			else if (sig == -1 ) {
-				PlaceOrderATS p = new PlaceOrderATS();
-				
-				
-				if(posN == 0 ) { // no position then sell to open
-					System.out.println("sell  to open");
-					p.placeOrder(contract, OrderATS.sellMarket(qty));
-					
-					LogFile w = new LogFile();
-					w.appendPlaceOrder(data+", Sell to Open, "+posSymbol+", "+qty);
-				}
-				else if (posN > 0) { // buy to close 
-					System.out.println("Sell to close ");
-					p.placeOrder(contract, OrderATS.sellMarket(qty));
-					
-					LogFile w = new LogFile();
-					w.appendPlaceOrder(data+", Sell to Close, "+posSymbol+", "+qty);
-					
-				}
-				else if (posN < 0) { // sell already
-					System.out.println("sell already");
-				}
-			}
-			else {
-				System.out.println("============wait==============");
-			} 
 
-			
 		}
-		
+		sendOrder(data, sig,posN,Double.parseDouble(qty));
 		
 		df.showChart(barsAdj);
 
 	}
 
+	public void sendOrder(String data, double sig,double posN, double qty) {
+		System.out.println("== Trade == "+contract.symbol() +" "+contract.currency() +" "+ contract.secType()+ " "+ posN+" " +qty);
+		
+		System.out.println("=====check condition before send order======");
+		
+		if (sig == 1 ) {
+			PlaceOrderATS p = new PlaceOrderATS();
+			
+			
+			if(posN == 0 ) { // no position then buy to open
+				System.out.println("Buy to open");
+				p.placeOrder(contract, OrderATS.buyMarket(qty));	
+				
+				
+				LogFile w = new LogFile();
+				w.appendPlaceOrder(data+", Buy to Open, "+contract.symbol()+", "+contract.currency()+", "+posN +", "+qty);
+				
+			}
+			else if (posN > 0) { // buy already
+				System.out.println("Buy alreay ");
+
+			}
+			else if (posN < 0) { // sell to close position
+				
+				System.out.println("Buy to close");
+				p.placeOrder(contract, OrderATS.buyMarket(qty));
+				
+				LogFile w = new LogFile();
+				w.appendPlaceOrder(data+", Buy to Close, "+contract.symbol()+", "+contract.currency()+", "+posN +", "+qty);
+				
+			}
+		}
+		else if (sig == -1 ) {
+			PlaceOrderATS p = new PlaceOrderATS();
+			
+			
+			if(posN == 0 ) { // no position then sell to open
+				System.out.println("sell  to open");
+				p.placeOrder(contract, OrderATS.sellMarket(qty));
+				
+				LogFile w = new LogFile();
+				w.appendPlaceOrder(data+", Sell to Open, "+contract.symbol()+", "+contract.currency()+", "+posN +", "+qty);
+				
+			}
+			else if (posN > 0) { // buy to close 
+				System.out.println("Sell to close ");
+				p.placeOrder(contract, OrderATS.sellMarket(qty));
+				
+				LogFile w = new LogFile();
+				w.appendPlaceOrder(data+", Sell to Close, "+contract.symbol()+", "+contract.currency()+", "+posN +", "+qty);
+				
+				
+			}
+			else if (posN < 0) { // sell already
+				System.out.println("sell already");
+			}
+		}
+		else {
+			System.out.println("============wait==============");
+		} 
+	}
+	
 	public void strategy_ATR() {
 		System.out.println(">>>>>>>>>>>>>>>>>>>>Initialize bars");
 		DataFrame df = new DataFrame();

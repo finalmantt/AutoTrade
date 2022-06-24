@@ -15,7 +15,7 @@ public class InputText extends JPanel{
 		this.value = value; 
 		
 		label = new JLabel(this.title);
-		text = new JTextField(value);
+		text = new JTextField(value, 10);
 		
 		add(label);
 		add(text);

@@ -115,7 +115,6 @@ public class API implements IConnectionHandler {
 		JButton btn_autoTrade = new JButton("Auto Trade");		
 		JButton btn_autoStart = new JButton("Start Trade");
 		JButton btn_autoStop = new JButton("Stop Trade");
-		JButton btn_autoSMA = new JButton("Auto SMA");
 		
 
 		JButton btn_realtime = new JButton("Realtime");
@@ -147,7 +146,7 @@ public class API implements IConnectionHandler {
 		p_top.add(btn_stopRealtime);
 		p_top.add(btn_backtest);
 		p_top.add(btn_autoTrade);
-		p_top.add(btn_autoSMA);
+		
 		///////////////// West
 		GridLayout gridWest = new GridLayout(0, 1);
 		p_west.setLayout(gridWest);
@@ -196,8 +195,8 @@ public class API implements IConnectionHandler {
 		InputText net = new InputText("Net liqudity", "0");
 		InputText txtSym = new InputText("Symbol", "EUR/USD");
 		InputText signal = new InputText("signal", "0");
-		GridLayout grid_autotrade = new GridLayout(5, 1);
 		
+		GridLayout grid_autotrade = new GridLayout(5, 1);		
 		JPanel sub_autotrade = new JPanel();
 		sub_autotrade.setLayout(grid_autotrade);
 		p_autotrade.add(tb_autoTrade.getScroll());
@@ -212,14 +211,23 @@ public class API implements IConnectionHandler {
 //		JButton btn_placeOrder = new JButton("Place");
 //		p_placeOrder.addComp(btn_placeOrder);
 		
+		
+		
 		tabPanel.add("Account/Postion", p_west); // tabPanel.setSelectedIndex(0);
 		tabPanel.add("Historical/Order", p_center); // tabPanel.setSelectedIndex(1);
 		tabPanel.add("Chart", p_east); // tabPanel.setSelectedIndex(2);
 		tabPanel.add("Bar Detail", contractPanel); // tabPanel.setSelectedIndex(3);
 		tabPanel.add("Back test", p_backtest); // tabPanel.setSelectedIndex(4);
-		tabPanel.add("Connecting", p_connect);// tabPanel.setSelectedIndex(4);
+		tabPanel.add("Connecting", p_connect);// tabPanel.setSelectedIndex(5);
 		tabPanel.add("AutoTrade", p_autotrade);// tabPanel.setSelectedIndex(6);
 		tabPanel.add("placeOrder", p_placeOrder);// tabPanel.setSelectedIndex(7);
+		
+		AutotradePanel atp1 = new AutotradePanel("EUR/USD","20000");
+		tabPanel.add("Auto1", atp1); // tabPanel.setSelectedIndex(8);
+		AutotradePanel atp2 = new AutotradePanel("EUR/GBP","20000");
+		tabPanel.add("Auto2", atp2); // tabPanel.setSelectedIndex(9);
+		AutotradePanel atp3 = new AutotradePanel("AAPL","1");
+		tabPanel.add("Auto3", atp3); // tabPanel.setSelectedIndex(10);
 		///// End TabPane
 
 		//// Frame structure
@@ -366,7 +374,14 @@ public class API implements IConnectionHandler {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				autoTrade();
+				
+//				String show = accData.getAccountDetail("NetLiquidation");
+//				System.out.println("NetLiquidation = "+ show);
+				
+				
 			}
+			
+			
 		});
 		
 		btn_autoStart.addActionListener(new ActionListener() {
@@ -417,11 +432,14 @@ public class API implements IConnectionHandler {
 	public void autoTrade() {
 		tabPanel.setSelectedIndex(6);
 //		AutoTrade auto = new AutoTrade(contractPanel,tb_autoTrade);
-
+		
+//		posData.getPosition();
+//		Position pos = posData.getPosition("EUR","FUT");
+//		System.out.println("position = "+pos.pos());
 	}
 	AutoTreadGO autogo ;
 	public void autoStart() {	
-		autogo = new AutoTreadGO(contractPanel,tb_autoTrade);
+		autogo = new AutoTreadGO(contractPanel,tb_autoTrade, "20000");
 	}
 
 	public void autoStop() {
@@ -486,18 +504,23 @@ public class API implements IConnectionHandler {
 	}
 
 	PositionATS pos = new PositionATS(tb_position);
-
+	PositionData posData = new PositionData();
 	public void showPosition() {
 
 		pos.reqPosition();
-
+//		posData.reqPosition();
 	}
 
 	AccountATS acc = null;
-
+	AccountData accData = null;
 	public void showAccount() {
 		acc = new AccountATS(accountList().get(0), tb_account);
 		acc.reqAccount();
+		
+//		accData = new AccountData(accountList().get(0));
+//		accData.reqAccount();
+		
+	
 	}
 
 	LiveOrderATS liveOrder = new LiveOrderATS(tb_order);
