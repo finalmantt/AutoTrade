@@ -15,5 +15,6 @@ public class TestTime {
 		Calendar cal2 = Calendar.getInstance();
 		cal.set(2022, 05, 19, 12, 12, 00);
 		System.out.println(cal2.compareTo(cal));
+		System.out.println(formatted);
 	}
 }

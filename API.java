@@ -53,33 +53,19 @@ public class API implements IConnectionHandler {
 
 	private final List<String> m_acctList = new ArrayList<>();
 
-	public TableData tb_account = new TableData(new String[] { "account", "key", "value", "currency" });
+//	public TableData tb_account = new TableData(new String[] { "account", "key", "value", "currency" });
 	public TableData tb_position = new TableData(new String[] { "account", "contract id", "symbol", "pos", "avg" });
 	public static TableData tb_bar = new TableData(new String[] { "time", "open", "high", "low", "close" });
 	public TableData tb_order = new TableData(new String[] { "orderId", "status", "filled", "remaining", "avgFillPrice",
 			"permId", "parentId", "lastFillPrice", "clientId", "whyHeld", "mktCapPrice" });
 
 	public TableData tb_dataTset = new TableData(new String[] { "time", "close" });
-
 	public TableData tb_backtest = new TableData(new String[] { "time", "open", "high", "low", "close" });
 	public TableData tb_pl = new TableData(new String[] { "time", "signal", "buy price", "sell price", "PL" });
-
-	public TableData tb_autoTrade = new TableData(new String[] { "time", "open", "high", "low", "close" });
-
-//
-//	static JFrame ff = new JFrame("CHART");
+//	public TableData tb_autoTrade = new TableData(new String[] { "time", "open", "high", "low", "close" });
 	public static JPanel chart = new JPanel();
 	JTabbedPane tabPanel = new JTabbedPane();
-//	JTextField txt_symbol = new JTextField("EUR");
-	JPanel p_west = new JPanel();
-	JPanel p_east = new JPanel();
-	JPanel p_center = new JPanel();
-	JPanel p_top = new JPanel();
-	JPanel p_buttom = new JPanel();
-
 	JPanel p_postion = new JPanel();
-	JPanel p_account = new JPanel();
-	JPanel p_order = new JPanel();
 	JPanel p_backtest = new JPanel();
 
 	static JTextField txtMoney = new JTextField("1");
@@ -92,80 +78,32 @@ public class API implements IConnectionHandler {
 //	ContractPanel contractPanel2 = new ContractPanel();
 	PlaceOrderPanel p_placeOrder = new PlaceOrderPanel();
 	InputText txt_pl = new InputText("PL", "0.0000");
-
+	
+	//////////////// Panel 
+	PanelAccount p_account = new PanelAccount();
+	PanelOrder p_order = new PanelOrder();
 	public static void main(String[] args) {
 		INSTANCE.run();
 	}
 
 	public void run() {
+		JPanel p_east = new JPanel();
+		JPanel p_center = new JPanel();
+		JPanel p_top = new JPanel();
+		JPanel p_buttom = new JPanel();
 		// make initial connection to local host, port 7496, client id 0
-
-		JButton btn_connect = new JButton("connect");
-		JButton btn_disconnect = new JButton("disconnect");
-		JButton btn_account = new JButton("Account");
-
-		JButton btn_hist = new JButton("Historical");
-		JButton btn_order = new JButton("Order");
-		JButton btn_buy = new JButton("place order");
-		JButton btn_cancel = new JButton("Cancel order");
-		JButton btn_option = new JButton("Option contract");
-		JButton btn_position = new JButton("get position");
-		JButton btn_closePosition = new JButton("close postion");
-		JButton btn_backtest = new JButton("Backtest");
-		JButton btn_autoTrade = new JButton("Auto Trade");		
-		JButton btn_autoStart = new JButton("Start Trade");
-		JButton btn_autoStop = new JButton("Stop Trade");
-		
-
-		JButton btn_realtime = new JButton("Realtime");
-		JButton btn_stopRealtime = new JButton("StopRealtime");
-
 		JScrollPane scroll_log = new JScrollPane(txt_log);
 		scroll_log.setPreferredSize(new Dimension(500, 120));
 
-		JPanel p_connect = new JPanel();
-		p_connect.add(btn_connect);
-		p_connect.add(btn_disconnect);
-
 		GridLayout gridTop = new GridLayout(0, 5);
 		p_top.setLayout(gridTop);
-//		p_top.add(btn_connect);
-//		p_top.add(btn_disconnect);
+
 		p_top.add(txt_time);
-		p_top.add(btn_account);
-		p_top.add(btn_hist);
-		p_top.add(btn_buy);
-		p_top.add(btn_cancel);
-		p_top.add(btn_order);
-		p_top.add(btn_option);
-		p_top.add(btn_position);
-		p_top.add(btn_closePosition);
 		p_top.add(txtMoney);
 		p_top.add(txtPosition);
-		p_top.add(btn_realtime);
-		p_top.add(btn_stopRealtime);
-		p_top.add(btn_backtest);
-		p_top.add(btn_autoTrade);
 		
-		///////////////// West
-		GridLayout gridWest = new GridLayout(0, 1);
-		p_west.setLayout(gridWest);
-		p_west.add(tb_account.getScroll());
-//		p_west.add(tb_position.getScroll());
 
 		///////////// Center
-
-		JPanel center_buttom = new JPanel();
-
-		center_buttom.add(tb_position.getScroll());
-		center_buttom.add(tb_order.getScroll());
-
-		GridLayout gridCenter = new GridLayout(0, 1);
-//		GridBagLayout gridCenter = new GridBagLayout();
-		p_center.setLayout(gridCenter);
-//		p_center.add(p_barDetail);
-		p_center.add(tb_bar.getScroll());
-		p_center.add(center_buttom);
 
 		///// East
 		p_east.add(chart);
@@ -174,15 +112,6 @@ public class API implements IConnectionHandler {
 		///// Buttom
 		p_buttom.add(scroll_log);
 
-//		JPanel p_contract = new JPanel();	
-
-//		ButtonGroup group = new ButtonGroup();		
-//		contractPanel.getRadioButton().setSelected(true);		
-//		group.add(contractPanel.getRadioButton() );
-//		group.add(contractPanel2.getRadioButton() );
-
-//		p_contract.add(contractPanel);
-//		p_contract.add(contractPanel2);
 		///// back test
 		p_backtest.add(tb_backtest.getScroll());
 		p_backtest.add(tb_pl.getScroll());
@@ -199,27 +128,21 @@ public class API implements IConnectionHandler {
 		GridLayout grid_autotrade = new GridLayout(5, 1);		
 		JPanel sub_autotrade = new JPanel();
 		sub_autotrade.setLayout(grid_autotrade);
-		p_autotrade.add(tb_autoTrade.getScroll());
-		sub_autotrade.add(btn_autoStart);
-		sub_autotrade.add(btn_autoStop);
+
+		
 		sub_autotrade.add(net);
 		sub_autotrade.add(txtSym);
 		sub_autotrade.add(signal);
-		
 		p_autotrade.add(sub_autotrade);
 
-//		JButton btn_placeOrder = new JButton("Place");
-//		p_placeOrder.addComp(btn_placeOrder);
-		
-		
-		
-		tabPanel.add("Account/Postion", p_west); // tabPanel.setSelectedIndex(0);
-		tabPanel.add("Historical/Order", p_center); // tabPanel.setSelectedIndex(1);
+	
+		tabPanel.add("Account", p_account.getPanelAccount()); // tabPanel.setSelectedIndex(0);
+		tabPanel.add("Ordert/Postion", p_order.getPanelOrder()); // tabPanel.setSelectedIndex(1);
 		tabPanel.add("Chart", p_east); // tabPanel.setSelectedIndex(2);
 		tabPanel.add("Bar Detail", contractPanel); // tabPanel.setSelectedIndex(3);
 		tabPanel.add("Back test", p_backtest); // tabPanel.setSelectedIndex(4);
-		tabPanel.add("Connecting", p_connect);// tabPanel.setSelectedIndex(5);
-		tabPanel.add("AutoTrade", p_autotrade);// tabPanel.setSelectedIndex(6);
+		tabPanel.add("Connecting", new PanelConnection());// tabPanel.setSelectedIndex(5);
+		
 		tabPanel.add("placeOrder", p_placeOrder);// tabPanel.setSelectedIndex(7);
 		
 		AutotradePanel atp1 = new AutotradePanel("EUR/USD","20000");
@@ -234,172 +157,11 @@ public class API implements IConnectionHandler {
 		frame.add(p_top, BorderLayout.NORTH);
 		frame.add(tabPanel, BorderLayout.CENTER);
 		frame.add(p_buttom, BorderLayout.SOUTH);
-
 		frame.setSize(900, 600);
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		//// End Frame structure
-
-		btn_connect.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				connect();
-			}
-		});
-		btn_disconnect.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				m_controller.disconnect();
-			}
-		});
-
-		btn_account.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				showAccount();
-//				AccountATS a = new AccountATS();
-//				showAccout();
-				// comment
-
-			}
-		});
-
-		btn_hist.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-
-				historical();
-
-			}
-		});
-
-		btn_buy.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				
-				buyOder();
-
-			}
-		});
-		btn_order.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				showOrder();
-
-			}
-		});
 		
-		
-		btn_cancel.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				cancelOrder();
-
-			}
-		});
-
-		btn_option.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-
-			}
-		});
-
-		btn_position.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				showPosition();
-
-			}
-		});
-
-		btn_closePosition.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-
-				closePosition();
-
-			}
-		});
-
-		btn_realtime.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				realtime();
-			}
-		});
-		btn_stopRealtime.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				stopRealtime();
-			}
-		});
-
-		btn_backtest.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				backtest();
-			}
-		});
-
-		btn_autoTrade.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				autoTrade();
-				
-//				String show = accData.getAccountDetail("NetLiquidation");
-//				System.out.println("NetLiquidation = "+ show);
-				
-				
-			}
-			
-			
-		});
-		
-		btn_autoStart.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				autoStart();
-			}
-		});
-		btn_autoStop.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				autoStop();
-			}
-		});
 		connect();
 
 	}
@@ -410,41 +172,6 @@ public class API implements IConnectionHandler {
 		m_controller.connect("127.0.0.1", 7496, 0, "");
 	}
 
-	RealTime real;
-
-//	
-//	public Contract getContractPanel() {
-//		String symbol = contractPanel.get_symbol();
-//		symbol = symbol.toUpperCase();
-//		System.out.println(symbol);
-//		Contract contract;
-//		if (symbol.contains("/")) {
-//			String symbol1 = symbol.split("/")[0];
-//			String symbol2 = symbol.split("/")[1];
-//			contract = ContractATS.getContractFX(symbol1, symbol2);
-//
-//		} else {
-//			contract = ContractATS.getContractStock(symbol);
-//
-//		}
-//		return contract;
-//	}
-	public void autoTrade() {
-		tabPanel.setSelectedIndex(6);
-//		AutoTrade auto = new AutoTrade(contractPanel,tb_autoTrade);
-		
-//		posData.getPosition();
-//		Position pos = posData.getPosition("EUR","FUT");
-//		System.out.println("position = "+pos.pos());
-	}
-	AutoTreadGO autogo ;
-	public void autoStart() {	
-		autogo = new AutoTreadGO(contractPanel,tb_autoTrade, "20000");
-	}
-
-	public void autoStop() {
-		autogo.reqStop();
-	}
 	public void historical() {
 		tabPanel.setSelectedIndex(1);
 //		HistoryATS a = new HistoryATS(contractPanel.getContact(), contractPanel.get_barSize());
@@ -452,14 +179,6 @@ public class API implements IConnectionHandler {
 		HistoryATS a = new HistoryATS(contractPanel);
 	}
 
-	public void realtime() {
-		tabPanel.setSelectedIndex(1);
-		real = new RealTime(contractPanel);
-	}
-
-	public void stopRealtime() {
-		real.reqStop();
-	}
 
 	BackTest backtest = new BackTest();
 
@@ -475,32 +194,9 @@ public class API implements IConnectionHandler {
 	static int stepAuto = 0;
 
 	public void initialize() {
-		showAccount();
+		p_account.showAccount();
 		showPosition();
 		showOrder();
-	}
-
-	public void closePosition() {
-//		Contract c = new Contract();
-//		Position p = pos.getPositon();
-//		c = p.contract();
-//		c.exchange("SMART");
-//
-//		if (c != null) {
-//			double qty = pos.getPositon().pos();
-//
-//			System.out.println(c.toString());
-//
-////		placeOrder.placeOrder(contract, placeOrder.sellLimit(10, qty));
-//			PlaceOrderATS pp = new PlaceOrderATS();
-//			OrderATS oo = new OrderATS();
-//			if (qty > 0)
-//				pp.placeOrder(c, oo.sellMarket(qty));
-//			else
-//				pp.placeOrder(c, oo.buyMarket(qty * -1));
-//			///
-//		}
-
 	}
 
 	PositionATS pos = new PositionATS(tb_position);
@@ -508,20 +204,9 @@ public class API implements IConnectionHandler {
 	public void showPosition() {
 
 		pos.reqPosition();
-//		posData.reqPosition();
+
 	}
 
-	AccountATS acc = null;
-	AccountData accData = null;
-	public void showAccount() {
-		acc = new AccountATS(accountList().get(0), tb_account);
-		acc.reqAccount();
-		
-//		accData = new AccountData(accountList().get(0));
-//		accData.reqAccount();
-		
-	
-	}
 
 	LiveOrderATS liveOrder = new LiveOrderATS(tb_order);
 
@@ -577,13 +262,17 @@ public class API implements IConnectionHandler {
 		System.out.println("Connected");
 		show("connected");
 
-		m_controller.reqCurrentTime(time -> show("Server date/time is " + Formats.fmtDate(time * 1000)));
+		m_controller.reqCurrentTime(time -> { 
+			show("Server date/time is " + Formats.fmtDate(time * 1000));
+			txt_time.setText(Formats.fmtDate(time * 1000));
+			});
 
 		m_controller.reqBulletins(true, (msgId, newsType, message, exchange) -> {
 			String str = String.format("Received bulletin:  type=%s  exchange=%s", newsType, exchange);
 			show(str);
 			show(message);
 		});
+	
 	}
 
 	@Override

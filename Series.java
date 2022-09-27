@@ -22,6 +22,9 @@ public class Series {
 	public void clear() {
 		s.clear();
 	}
+	public void remove(int index) {
+		s.remove(index);
+	}
 	public int size() {
 		return s.size();
 	}

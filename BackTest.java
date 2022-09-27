@@ -17,46 +17,45 @@ import com.ib.controller.ApiController.IHistoricalDataHandler;
 import com.ib.controller.Bar;
 
 public class BackTest implements IHistoricalDataHandler {
-	
+
 	TableData tb_pl;
 	ArrayList<Bar> bars = new ArrayList<Bar>();
 	ContractPanel contractPanel;
-	InputText textPL = new InputText("", "") ;
+	InputText textPL = new InputText("", "");
 	BackTestPL pl;
-	
+
 	WhatToShow whatToShow = WhatToShow.TRADES;
 	Contract contract = new Contract();
-	
+
 	ArrayList<Bar> barsAdj = new ArrayList<Bar>();
-	
 
 	TableData tableData;
-	
 
 	BarSize barSize;
 	int duratation = 2;
 	DurationUnit durationUnit;
-	
-	BackTest(){
-		
+
+	BackTest() {
+
 	}
-	BackTest(TableData table, TableData tb_pl,  ContractPanel contractPanel){
+
+	BackTest(TableData table, TableData tb_pl, ContractPanel contractPanel) {
 		this.tableData = table;
 		this.contractPanel = contractPanel;
 		this.contract = contractPanel.getContact();
 		this.duratation = contractPanel.get_duration();
 		this.barSize = contractPanel.get_barSize();
 		this.durationUnit = contractPanel.get_durationUnit();
-		
+
 		this.tb_pl = tb_pl;
 		this.contractPanel = contractPanel;
 
 		this.tableData.setTableSize(400, 250);
-		
+
 		System.out.println("backtest");
-		
+
 	}
-	
+
 	public void reqHist() {
 		if (contract.secType().equals(SecType.CASH)) {
 			whatToShow = whatToShow.MIDPOINT;
@@ -78,44 +77,64 @@ public class BackTest implements IHistoricalDataHandler {
 		API.INSTANCE.m_controller.reqHistoricalData(contract, endDateTime, duratation, durationUnit, barSize,
 				whatToShow, rthOnly, keepUpToDate, this);
 	}
+
 	public void setTextPL(InputText textPL) {
 		this.textPL = textPL;
 	}
-	
-	public void CalulateIndicator() {
-	
-		
-		
 
-		
+	public void CalulateIndicator() {
+
 		System.out.println(">>>>>>>>>>>>>>>>>>>>Calculate indicators");
 		DataFrame df = new DataFrame();
 		df.setHeader(Arrays.asList("time", "open", "high", "low", "close"));
 		df.setDataBar(barsAdj);
 
+		// add indicatore with sinal
+//		IndyATRStop atrstop = new IndyATRStop();
+//		atrstop.setIndy(10, barsAdj);
+//		df.addCol(atrstop.getLongStop(), "longstop",tableData);
+//		df.addCol(atrstop.getShortgStop(), "shortstop",tableData);
+//
+//
+//		df.addCol(atrstop.getATRStop(), "atrstop",tableData);
+//		df.addCol(atrstop.getTrend(), "trend",tableData);
+//		df.addCol(atrstop.getSignal(), "signal",tableData);
 
-		IndyATRStop atrstop = new IndyATRStop();
-		atrstop.setIndy(10, barsAdj);
-//		System.out.println(atrstop.getSignal().toStringArray());
-		df.addCol(atrstop.getLongStop(), "longstop",tableData);
-		df.addCol(atrstop.getShortgStop(), "shortstop",tableData);
+		/// Define indicators
+		Series close = df.getColBar("close");
+		IndySMA sma1 = new IndySMA();
+		sma1.setSMA(5, close);
+		df.addCol(sma1.getSMA(), "SMA5", tableData);
 
-//		df.addCol(atrstop.getTrend(), "trend");
-		df.addCol(atrstop.getATRStop(), "atrstop",tableData);
-		df.addCol(atrstop.getTrend(), "trend",tableData);
-		df.addCol(atrstop.getSignal(), "signal",tableData);
+		IndySMA sma2 = new IndySMA();
+		sma2.setSMA(10, close);
+		df.addCol(sma2.getSMA(), "SMA40", tableData);
+		
+		IndyOperation ino = new IndyOperation();
+		Series signal = ino.cross(sma1.getSMA(), sma2.getSMA());
+		df.addCol(signal, "cross", tableData);
 
-		 pl = new BackTestPL(df, tb_pl);
+		IndyDonchain donchain = new IndyDonchain();
+		donchain.setIndy(48, bars);
+		df.addCol(donchain.getUpper(), "Upper", tableData);
+		df.addCol(donchain.getLower(), "Lower", tableData);
+
+//		IndyOperation ino2 = new IndyOperation();
+//		Series signal2 = ino2.cross(close, donchain.getUpper());
+//		df.addCol(signal2, "c>Up", tableData);
+		
+		
+		pl = new BackTestPL(df, tb_pl);
 
 		pl.showPL();
-		sum = pl.getSum();		
-		textPL.setText(""+sum);
+		sum = pl.getSum();
+		textPL.setText("" + sum);
 //		System.out.println("SUMMMMMMMMMMMMM "+ this.sum);
 		tableData.setScrollToButtom();
-		
+
 		df.showChart(barsAdj);
 	}
-	
+
 	public void setBarFX() {
 
 		tableData.clearRows();
@@ -156,10 +175,13 @@ public class BackTest implements IHistoricalDataHandler {
 		tableData.addRow(new String[] { bar.formattedTime(), "" + bar.open(), "" + bar.high(), "" + bar.low(),
 				"" + bar.close() });
 	}
+
 	double sum = 0;
+
 	public double getSum() {
 		return sum;
 	}
+
 	@Override
 	public void historicalData(Bar bar) {
 		// TODO Auto-generated method stub
@@ -169,7 +191,7 @@ public class BackTest implements IHistoricalDataHandler {
 	@Override
 	public void historicalDataEnd() {
 		// TODO Auto-generated method stub
-		System.out.println("historicalDataEnd "+bars.size());
+		System.out.println("historicalDataEnd " + bars.size());
 //		setHistorical();
 		if (contract.secType().equals(SecType.CASH)) {
 			setBarFX();
@@ -180,7 +202,6 @@ public class BackTest implements IHistoricalDataHandler {
 
 		}
 
-		
 	}
 
 }

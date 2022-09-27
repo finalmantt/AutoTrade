@@ -35,7 +35,7 @@ public class LogFile {
 		LocalDate myObj = LocalDate.now(); // Create a date object
 //		System.out.println(myObj); // Display the current date
 		
-		String path = "\\TWS API\\samples\\Java\\autotrade\\";
+		String path = "\\TWS API\\samples\\Java\\autotrade\\LogFile\\";
 		String filename = "placeOrder_"+myObj+".txt";
 
 		try {

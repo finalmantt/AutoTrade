@@ -34,15 +34,13 @@ public class AccountATS implements IAccountHandler {
 	}
 
 	public void setAccount() {
-		System.out.println("m_account >>" + m_account);
+//		System.out.println("m_account >>" + m_account);
 		table.clearRows();
 		
 		for (Map.Entry<String, Account> entry : m_account.entrySet()) {
 			table.addRow(new String[] { entry.getValue().account(), entry.getValue().key(),
 					entry.getValue().value(), entry.getValue().currency()});
-//			API.tb_account.getModel().addRow(new String[] { entry.getValue().account(), entry.getValue().key(),
-//					entry.getValue().value(), entry.getValue().currency()});
-			
+
 			if(entry.getValue().key().equals("NetLiquidation")) {
 				API.txtMoney.setText(entry.getValue().value());
 			}

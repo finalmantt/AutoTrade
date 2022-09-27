@@ -143,6 +143,14 @@ public class HistoryATS implements IHistoricalDataHandler {
 		df.addCol(atrstop.getTrend(), "trend",API.tb_bar);
 		df.addCol(atrstop.getSignal(), "signal",API.tb_bar);
 
+		/// donchain
+		IndyDonchain donchian = new IndyDonchain();
+		donchian.setIndy(10, bars);
+//
+		df.addCol(donchian.getUpper(), "upper",API.tb_bar);
+		df.addCol(donchian.getLower(), "lower",API.tb_bar);
+		
+		
 		System.out.println(atrstop.getTrend().size());
 //		boolean sigbuy = false;
 //		sigbuy = s5.getBar(1) < s21.getBar(1) && s5.getBar(0) > s21.getBar(0);

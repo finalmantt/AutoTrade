@@ -19,7 +19,7 @@ public class TableData extends DefaultTableModel {
 	JTable table;
 	JScrollPane scrollPane;
 	ArrayList<String> columnName = new ArrayList<String>();
-
+	
 	TableData() {
 
 	}
@@ -67,6 +67,12 @@ public class TableData extends DefaultTableModel {
 		return -1;
 	}
 
+//	public void addCol() {
+//
+//	//	
+//			model.addColumn("test", new String[] { "dd", "as", "ss" });
+//
+//		}
 	public void addColumn(String name, Vector<String> data) {
 		if (findColumn(name) == -1) {
 			super.addColumn(name, data);
